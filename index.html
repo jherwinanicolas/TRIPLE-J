@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Budget Planner</title>
+    <style>
+        body {
+            font-family: Arial;
+            background-color: #f0f8f0;
+            text-align: center;
+        }
+
+        .container {
+            background: white;
+            width: 80%;
+            max-width: 500px;
+            margin: 30px auto;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        input, select, button {
+            padding: 10px;
+            margin: 5px;
+        }
+
+        button {
+            background-color: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        li {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Budget Planner</h1>
+
+    <h3>Add Financial Record</h3>
+
+    <input type="text" id="name"
+           placeholder="Record name">
+
+    <select id="type">
+        <option value="Income">Income</option>
+        <option value="Expense">Expense</option>
+        <option value="Savings">Savings</option>
+    </select>
+
+    <input type="number" id="amount"
+           placeholder="Amount">
+
+    <button onclick="addRecord()">Add Record</button>
+
+    <h3>Financial Summary</h3>
+    <p id="income">Income: ₱0</p>
+    <p id="expenses">Expenses: ₱0</p>
+    <p id="savings">Savings: ₱0</p>
+    <p id="balance">Balance: ₱0</p>
+
+    <h3>Records</h3>
+    <ul id="records"></ul>
+</div>
+
+<script>
+    let data = [];
+    let editIndex = -1;
+
+    function addRecord() {
+        let name = document.getElementById("name").value;
+        let type = document.getElementById("type").value;
+        let amount = Number(document.getElementById("amount").value);
+
+        if (name === "" || amount <= 0) {
+            alert("Please enter a name and valid amount.");
+            return;
+        }
+
+        let record = {
+            name: name,
+            type: type,
+            amount: amount
+        };
+
+        if (editIndex === -1) {
+            data.push(record);
+        } else {
+            data[editIndex] = record;
+            editIndex = -1;
+            document.querySelector("button").innerText = "Add Record";
+        }
+
+        document.getElementById("name").value = "";
+        document.getElementById("amount").value = "";
+
+        displayRecords();
+    }
+
+    function displayRecords() {
+        let list = document.getElementById("records");
+        list.innerHTML = "";
+
+        let income = 0;
+        let expenses = 0;
+        let savings = 0;
+
+        data.forEach(function(record, index) {
+            if (record.type === "Income") {
+                income += record.amount;
+            } else if (record.type === "Expense") {
+                expenses += record.amount;
+            } else {
+                savings += record.amount;
+            }
+
+            let item = document.createElement("li");
+            item.textContent = record.name + " - " +
+                record.type + ": ₱" + record.amount + " ";
+
+            let editButton = document.createElement("button");
+            editButton.textContent = "Edit";
+            editButton.onclick = function() {
+                editRecord(index);
+            };
+
+            let deleteButton = document.createElement("button");
+            deleteButton.textContent = "Delete";
+            deleteButton.onclick = function() {
+                data.splice(index, 1);
+                displayRecords();
+            };
+
+            item.appendChild(editButton);
+            item.appendChild(deleteButton);
+            list.appendChild(item);
+        });
+
+        document.getElementById("income").innerText =
+            "Income: ₱" + income;
+
+        document.getElementById("expenses").innerText =
+            "Expenses: ₱" + expenses;
+
+        document.getElementById("savings").innerText =
+            "Savings: ₱" + savings;
+
+        document.getElementById("balance").innerText =
+            "Balance: ₱" + (income - expenses - savings);
+    }
+
+    function editRecord(index) {
+        document.getElementById("name").value =
+            data[index].name;
+
+        document.getElementById("type").value =
+            data[index].type;
+
+        document.getElementById("amount").value =
+            data[index].amount;
+
+        editIndex = index;
+        document.querySelector("button").innerText = "Update Record";
+    }
+</script>
+
+</body>
+</html>
